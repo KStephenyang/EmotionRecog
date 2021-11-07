@@ -1,9 +1,6 @@
-from datasets import Dataset
-from torch import nn
 import numpy as np
 import torch
-
-from dataset.loader import EmotionDataset
+from torch import nn
 
 
 def generate_submit_result(test_data, test_result, model_fusion_path, submit_file_path):

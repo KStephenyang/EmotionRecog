@@ -8,7 +8,7 @@ from transformers.trainer_utils import IntervalStrategy
 
 from config import train_config as const
 from dataset.collator import data_collator_emotion
-from dataset.loader import EmotionDataset
+from dataset.loader import EmotionBertDataset
 from dataset.token_map import tokenize_map
 from eval.metric import compute_metrics_ce
 from eval.submit import generate_submit_result
@@ -22,12 +22,12 @@ def train():
     tokenizer = BertTokenizer.from_pretrained(const.BertPath)
 
     # 1.训练数据预处理
-    if os.path.exists(const.DataPklPath):
-        tokenized_datasets = load_from_disk(const.DataPklPath)
+    if os.path.exists(const.TrainDatasetPath):
+        tokenized_datasets = load_from_disk(const.TrainDatasetPath)
     else:
-        emo_dataset = EmotionDataset(const.TrainDataPath)
-        data_raw = emo_dataset.preprocess()
-        train_df, valid_df = emo_dataset.split_train_valid(data_raw, seed=const.RandomSeed, num=30000)
+        train_dataset = EmotionBertDataset(const.TrainDataPath)
+        train_dataset.preprocess()
+        train_df, valid_df = train_dataset.split_train_valid(seed=const.RandomSeed, num=30000)
         train_datasets = Dataset.from_pandas(train_df)
         valid_datasets = Dataset.from_pandas(valid_df)
         raw_datasets = DatasetDict()
@@ -37,7 +37,7 @@ def train():
             tokenize_map, batched=True,
             fn_kwargs={"tokenizer": tokenizer, "model_type": const.ModelType}
         )
-        tokenized_datasets.save_to_disk(const.DataPklPath)
+        tokenized_datasets.save_to_disk(const.TrainDatasetPath)
 
     data_collator = data_collator_emotion(
         tokenizer=tokenizer, padding=True, max_length=512, model_type=const.ModelType
@@ -67,8 +67,8 @@ def train():
     trainer = EmotionTrainer(
         model,
         training_args,
-        train_dataset=tokenized_datasets["train"].select(range(0, 20)),
-        eval_dataset=tokenized_datasets["validation"].select(range(0, 8)),
+        train_dataset=tokenized_datasets["train"],
+        eval_dataset=tokenized_datasets["validation"],
         data_collator=data_collator,
         tokenizer=tokenizer,
         compute_metrics=compute_metrics_ce
@@ -79,8 +79,7 @@ def train():
     # 5.生成模型评估结果
     trainer.evaluate()
     # 6.生成提交结果
-
-    test_dataset = EmotionDataset(const.TestDataPath)
+    test_dataset = EmotionBertDataset(const.TestDataPath)
     test_data = test_dataset.preprocess()
     test_datasets = Dataset.from_pandas(test_data)
     test_datasets = test_datasets.map(

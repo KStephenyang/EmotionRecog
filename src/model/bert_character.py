@@ -11,8 +11,6 @@ class EmotionPooler(nn.Module):
             config.get("d_out"))
 
     def forward(self, embeddings):
-        # We "pool" the model by simply taking the hidden state corresponding
-        # to the first token.
         pooled_output = self.dense(embeddings)
         pooled_output = self.activation(pooled_output)
         return pooled_output
@@ -46,21 +44,6 @@ class BertCharacter(nn.Module):
         anger = self.out_anger(pooled_output)
         fear = self.out_fear(pooled_output)
         sorrow = self.out_sorrow(pooled_output)
-        # pooled_output = sequence_output[:, 0]
-        # embed_script = self.embed_script(script_id_id)
-        # embed_script = script_id_id.view(embed_text.shape[0], -1)
-        # # embed_scene = self.embed_scene(scene_num_id)
-        # embed_scene = scene_num_id.view(embed_text.shape[0], -1)
-        # # embed_sentence = self.embed_sentence(sentence_num_id)
-        # embed_sentence = sentence_num_id.view(embed_text.shape[0], -1)
-        # # embed_character = self.embed_character(character_id)
-        # embed_character = character_id.view(embed_text.shape[0], -1)
-        # embeddings = torch.cat(
-        #     (embeddings, dense_features),
-        #     dim=1
-        # )
-        # 生成输出结果
-        # output = self.ffd0(pooled_output)
         return ModelOutput(
             love=love, joy=joy, fright=fright,
             anger=anger, fear=fear, sorrow=sorrow

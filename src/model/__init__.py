@@ -1,6 +1,6 @@
 from .bert_context import BertCharacterContext
 from .bert_character import BertCharacter
-from .xgb_character import *
+from .xgb_character import BertEncoder
 
 
 def model_builder(bert_path, tokenizer, model_type):
@@ -24,5 +24,5 @@ def model_builder(bert_path, tokenizer, model_type):
     elif model_type == "bert_character":
         model = BertCharacter(config)
     else:
-        model = BertCharacter(config)
+        model = BertEncoder(config)
     return model
