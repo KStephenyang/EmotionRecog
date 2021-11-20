@@ -6,8 +6,8 @@ ProPath = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 TrainDataPath = os.path.join(ProPath, "data/train_dataset_v2.tsv")
 TestDataPath = os.path.join(ProPath, "data/test_dataset.tsv")
 
-TrainDataEmbedPath = os.path.join(ProPath, "data/train_dataset_embed_v1.tsv")
-TestDataEmbedPath = os.path.join(ProPath, "data/test_dataset_embed_v1.tsv")
+TrainDataEmbedPath = os.path.join(ProPath, "data/train_dataset_embed_v1.pkl")
+TestDataEmbedPath = os.path.join(ProPath, "data/test_dataset_embed_v1.pkl")
 
 BertPath = os.path.join(ProPath, "pretrained/chinese-roberta-wwm-ext")
 ModelSavePath = os.path.join(ProPath, "output/emotion_simple_model_{}.pt")
@@ -23,7 +23,7 @@ TrainDatasetPath = os.path.join(ProPath, "data/dataset_train")
 EncodeDatasetPath = os.path.join(ProPath, "data/dataset_encode")
 
 RandomSeed = 10
-ModelType = "bert_character_context"
+ModelType = "lgb_context"
 suffix = datetime.now().strftime("%Y%m%d%H%M")
 TestResult = os.path.join(ProPath, "output/test_result.pkl")
 SubmitFileTsv = os.path.join(ProPath, f"output/submit_{ModelType}_{suffix}.tsv")

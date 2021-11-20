@@ -34,7 +34,7 @@ def train():
         raw_datasets["train"] = train_datasets
         raw_datasets["validation"] = valid_datasets
         tokenized_datasets = raw_datasets.map(
-            tokenize_map, batched=True,
+            tokenize_map, batched=True, num_proc=4,
             fn_kwargs={"tokenizer": tokenizer, "model_type": const.ModelType}
         )
         tokenized_datasets.save_to_disk(const.TrainDatasetPath)

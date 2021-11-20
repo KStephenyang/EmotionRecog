@@ -9,7 +9,6 @@ from transformers.trainer_utils import IntervalStrategy
 
 from config import train_config as const
 from dataset.collator import data_collator_emotion
-from dataset.loader import EmotionXgbDataset
 from dataset.token_map import tokenize_map
 from model import model_builder
 
@@ -23,14 +22,16 @@ def train():
     if os.path.exists(const.EncodeDatasetPath):
         raw_datasets = load_from_disk(const.EncodeDatasetPath)
     else:
-        train_dataset = EmotionXgbDataset(const.TrainDataPath)
-        train_dataset.preprocess()
-        train_data = train_dataset.get_data()
+        # train_dataset = EmotionXgbDataset(const.TrainDataPath)
+        # train_dataset.preprocess()
+        # train_data = train_dataset.get_data()
+        train_data = pd.read_csv(const.TrainDataPath, sep='\t')
         del train_data["emotions"]
         train_datasets = Dataset.from_pandas(train_data)
-        test_dataset = EmotionXgbDataset(const.TestDataPath)
-        test_dataset.preprocess()
-        test_data = test_dataset.get_data()
+        # test_dataset = EmotionXgbDataset(const.TestDataPath)
+        # test_dataset.preprocess()
+        # test_data = test_dataset.get_data()
+        test_data = pd.read_csv(const.TestDataPath, sep='\t')
         test_datasets = Dataset.from_pandas(test_data)
         raw_datasets = DatasetDict()
 
@@ -77,14 +78,12 @@ def train():
     train_embed = trainer.predict(raw_datasets["train"].select(range(0, 20)))
     train_data = pd.read_csv(const.TrainDataPath, sep='\t').iloc[0:20]
     train_data["embedding"] = train_embed.predictions.tolist()
-    train_data.to_csv(const.TrainDataEmbedPath, sep='\t', index=False)
-    print(train_embed)
+    train_data.to_pickle(const.TrainDataEmbedPath)
     # 5.embed测试数据
     test_embed = trainer.predict(raw_datasets["test"].select(range(0, 20)))
-    test_data = pd.read_csv(const.TestDataPath, sep='\t')
+    test_data = pd.read_csv(const.TestDataPath, sep='\t').iloc[0:20]
     test_data["embedding"] = test_embed.predictions.tolist()
-    test_data.to_csv(const.TestDataEmbedPath, sep='\t', index=False)
-    print(test_embed)
+    test_data.to_pickle(const.TestDataEmbedPath)
 
 
 if __name__ == "__main__":
